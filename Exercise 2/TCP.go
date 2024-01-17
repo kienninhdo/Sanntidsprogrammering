@@ -34,7 +34,7 @@ func TCPserver() {
 
 	for {
 		newClient, _ := socket.Accept()
-		
+
 		//HANDLE:
 		defer newClient.Close()
 
@@ -58,6 +58,8 @@ func main() {
 
 	go TCPclient()
 	go TCPserver()
+
+	fmt.Printf("this is a test")
 
 	select {}
 
