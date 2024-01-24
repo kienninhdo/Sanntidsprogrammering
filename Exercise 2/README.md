@@ -88,24 +88,38 @@ Before proceeding with any code related to a network module, think about how you
 
  - Guarantees about elevators:
    - What should happen if one of the nodes loses its network connection?
-     - 
+    Lagre innholdet et annet sted slik at de andre nodene også kan få tak i informasjonen og ta over.
    - What should happen if one of the nodes loses power for a brief moment?
+    Sende ut feilmelding til de andre nodene. pluss pluss
    - What should happen if some unforeseen event causes the elevator to never reach its destination, but communication remains intact?
+    HARD reset
    
  - Guarantees about orders:
-   - Do all your nodes need to "agree" on a call for it to be accepted? In that case, how is a faulty node handled? 
+   - Do all your nodes need to "agree" on a call for it to be accepted? In that case, how is a faulty node handled?
+  Hvis vi har en node som ikke fungerer, så utelukkes den fra accept-casen
    - How can you be sure that a remote node "agrees" on an call?
+  Acknowledge
    - How do you handle losing packets between the nodes?
-   - Do you share the entire state of the current calls, or just the changes as they occur?
-     - For either one: What should happen when an elevator re-joins after having been offline?
+  Acknowledge and double-send
+  
+  - Do you share the entire state of the current calls, or just the changes as they occur?
+  VI burde dele tilstand til enhver tid for da unngår vi feil og heisene vet alltid hverandres tilstand og hvordan de skal ta hensyn til hverandre(også den som er offline)
+  
+  - For either one: What should happen when an elevator re-joins after having been offline?
+  Oppdatere tilstanden sin før den tar nye bestillinger, må ha en oppdatering fra hovedserver
+  
 
 Pencil and paper is encouraged! Drawing a diagram/graph of the message pathways between nodes (elevators) will aid in visualizing complexity. Drawing the order of messages through time will let you more easily see what happens when communication fails.
      
  - Topology:
    - What kind of network topology do you want to implement? Peer to peer? Master slave? Circle? Something else?
+  Master-slave!
    - In the case of a master-slave configuration: Do you have only one program, or two (a "master" executable and a "slave")?
+
      - How do you handle a master node disconnecting?
+  Secondary master node som står på standby
      - Is a slave becoming a master a part of the network module?
+  Les svar over
    - In the case of a peer-to-peer configuration:
      - Who decides the order assignment?
      - What happens if someone presses the same button on two panels at once? Is this even a problem?
@@ -115,13 +129,20 @@ Pencil and paper is encouraged! Drawing a diagram/graph of the message pathways 
       - If you are using TCP: How do you know who connects to who?
         - Do you need an initialization phase to set up all the connections?
       - If you are using UDP broadcast: How do you differentiate between messages from different nodes?
+    UDP for broadcast
+    TCP for robusthet, UDP for speed
       - If you are using a library or language feature to do the heavy lifting - what is it, and does it satisfy your needs?
    - Do you want to build the necessary reliability into the module, or handle that at a higher level?
+  Vi vil at hver modul skal klare seg selv, så lite avhengighet som mulig
    - Is detection (and handling) of things like lost messages or lost nodes a part of the network module?
+  Burde løses internt ja, for å unngå unødvendig kommunikasjon. De får sjekke error-meldinger selv
    - How will you pack and unpack (serialize) data?
      - Do you use structs, classes, tuples, lists, ...?
+  Klasser (private by default), fungerer bra for du kan modifisere det til formålet ditt
      - JSON, XML, plain strings, or just plain memcpy?
+- JSON er mest ryddig å bruke, XML er for kompleks data, men det trengs kanskje ikke?
      - Is serialization a part of the network module?
+  Yes, det faller naturlig inn i hele pakken med datasending og behandling
 
 2.2: Getting networking started
 -------------------------------

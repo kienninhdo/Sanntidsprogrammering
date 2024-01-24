@@ -14,15 +14,15 @@ func TCPclient() {
 	defer socket.Close()
 
 	//Send message
-	message := "Connect to 127.0.0.1:33546\000"
+	message := "Connect to 127.0.0.1:33546\000" // DET ER DENNE MELDINGEN JEG VIL HA UT I TERMINALEN
 	socket.Write([]byte(message))
 
 	//Read message
-	buffer := make([]byte, 1024)
-	n, _ := socket.Read(buffer)
+	// buffer := make([]byte, 1024)
+	// n, _ := socket.Read(buffer)
 
-	receivedString := string(buffer[:n])
-	fmt.Println("Message from server:", receivedString)
+	// receivedString := string(buffer[:n])
+	// fmt.Println("Message from server:", receivedString)
 }
 
 func TCPserver() {
@@ -42,6 +42,17 @@ func TCPserver() {
 		buffer := make([]byte, 1024)
 		n, _ := newClient.Read(buffer)
 
+		//DELAY
+		tcpClient, ok := newClient.(*net.TCPConn)
+		if ok {
+			err := tcpClient.SetNoDelay(true)
+			if err != nil {
+				fmt.Println("Error setting TCP_NODELAY:", err)
+
+			}
+		}
+		// fmt.Println("KIEN")
+
 		receivedString := string(buffer[:n])
 		fmt.Println("Message from client:", receivedString)
 
@@ -58,8 +69,6 @@ func main() {
 
 	go TCPclient()
 	go TCPserver()
-
-	fmt.Printf("this is a test")
 
 	select {}
 
